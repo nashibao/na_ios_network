@@ -24,17 +24,13 @@ static NSTimeInterval const kAFNetworkActivityIndicatorInvisibilityDelay = 0.17;
     static dispatch_once_t oncePredicate;
     dispatch_once(&oncePredicate, ^{
         _sharedManager = [[self alloc] init];
-        _sharedManager.defaultSVProgressHUDMaskType = SVProgressHUDMaskTypeNone;
+        _sharedManager.defaultProgressHUDMaskType = NAProgressHUDMaskTypeDisabled;
         _sharedManager.enableSVProgress = YES;
         _sharedManager.activityObjectWithIdentifiers = [@{} mutableCopy];
     });
     
     return _sharedManager;
 }
-
-//+ (NSSet *)keyPathsForValuesAffectingIsNetworkActivityIndicatorVisible {
-//    return [NSSet setWithObject:@"activityCount"];
-//}
 
 - (id)init {
     self = [super init];
@@ -89,17 +85,24 @@ static NSTimeInterval const kAFNetworkActivityIndicatorInvisibilityDelay = 0.17;
     if(![self enableSVProgress])
         return;
     if([self isNetworkActivityIndicatorVisible]){
-        SVProgressHUDMaskType maskType = self.defaultSVProgressHUDMaskType;
-        if(option[@"defaultSVProgressHUDMaskType"]){
-            maskType = [option[@"defaultSVProgressHUDMaskType"] integerValue];
+        NAProgressHUDMaskType maskType = self.defaultProgressHUDMaskType;
+        if(option[@"progressHUDMaskType"] && [option[@"progressHUDMaskType"] integerValue] != NAProgressHUDMaskTypeDefault){
+            maskType = [option[@"progressHUDMaskType"] integerValue];
         }
-        [SVProgressHUD showWithMaskType:maskType];
+        if(maskType != NAProgressHUDMaskTypeDisabled)
+            [SVProgressHUD showWithMaskType:maskType];
+//        元々表示されていたのに、表示していないやつで、上書きしないようにする
+        if(!(self.currentProgressHUDMaskType != NAProgressHUDMaskTypeDisabled && maskType == NAProgressHUDMaskTypeDisabled))
+            self.currentProgressHUDMaskType = maskType;
     }else{
-        if([self.errors count] > 0){
-            [SVProgressHUD showErrorWithStatus:[self errorString]];
-        }else{
-            [SVProgressHUD showSuccessWithStatus:@""];
+        if(self.currentProgressHUDMaskType != NAProgressHUDMaskTypeDisabled){
+            if([self.errors count] > 0){
+                [SVProgressHUD showErrorWithStatus:[self errorString]];
+            }else{
+                [SVProgressHUD showSuccessWithStatus:@""];
+            }
         }
+        self.currentProgressHUDMaskType = NAProgressHUDMaskTypeDisabled;
     }
 }
 
@@ -121,7 +124,7 @@ static NSTimeInterval const kAFNetworkActivityIndicatorInvisibilityDelay = 0.17;
     [self updateNetworkActivityIndicatorVisibilityDelayed: nil];
 }
 
-- (void)incrementActivityCount:(NSString *)identifier option:(NSDictionary *)option{
+- (void)incrementActivityCount:(NSString *)identifier maskType:(NAProgressHUDMaskType)maskType option:(NSDictionary *)option{
     [self willChangeValueForKey:@"activityCount"];
     @synchronized(self) {
         if(_activityCount == 0){
@@ -135,13 +138,23 @@ static NSTimeInterval const kAFNetworkActivityIndicatorInvisibilityDelay = 0.17;
             }else{
                 io = [[NANetworkActivityIndicatorActivityObject alloc] init];
                 io.activityCount = 1;
+                io.defaultProgressHUDMaskType = maskType;
                 io.identifier = identifier;
                 self.activityObjectWithIdentifiers[identifier] = io;
             }
         }
     }
+    if(maskType){
+        if(isnull(option)){
+            option = @{@"progressHUDMaskType": @(maskType)};
+        }else if(!option[@"progressHUDMaskType"]){
+            NSMutableDictionary *temp = [option mutableCopy];
+            temp[@"progressHUDMaskType"] = @(maskType);
+            option = temp;
+        }
+    }
     [self didChangeValueForKey:@"activityCount"];
-    [self updateNetworkActivityIndicatorVisibilityDelayed: option];
+    [self updateNetworkActivityIndicatorVisibilityDelayed:option];
 }
 
 - (void)decrementActivityCount:(NSString *)identifier{
@@ -179,7 +192,7 @@ static NSTimeInterval const kAFNetworkActivityIndicatorInvisibilityDelay = 0.17;
 }
 
 - (void)insert:(NSString *)identifier error:(NSString *)error option:(NSDictionary *)option{
-    [self incrementActivityCount:identifier option:option];
+    [self incrementActivityCount:identifier maskType:NAProgressHUDMaskTypeDefault option:option];
     [self decrementActivityCount:identifier error:error];
 }
 

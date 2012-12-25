@@ -10,8 +10,6 @@
 
 #import "NSOperationQueue+na.h"
 
-#import "NANetworkActivityIndicatorManager.h"
-
 #import "Reachability.h"
 
 #import "JSONKit.h"
@@ -81,7 +79,7 @@ static BOOL __reachability__ = NO;
                                      queueingOption:(NANetworkOperationQueingOption)queueingOption
                                      successHandler:(void(^)(NANetworkOperation *op, id data))successHandler
                                        errorHandler:(void(^)(NANetworkOperation *op, NSError *err))errorHandler{
-    return [self _sendAsynchronousRequest:request isJson:YES jsonOption:jsonOption returnEncoding:returnEncoding returnMain:returnMain queue:queue identifier:identifier identifierMaxCount:identifierMaxCount options:options queueingOption:queueingOption successHandler:successHandler errorHandler:errorHandler completeHandler:nil];
+    return [self _sendAsynchronousRequest:request isJson:YES jsonOption:jsonOption returnEncoding:returnEncoding returnMain:returnMain queue:queue identifier:identifier identifierMaxCount:identifierMaxCount maskType:NAProgressHUDMaskTypeDefault options:options queueingOption:queueingOption successHandler:successHandler errorHandler:errorHandler completeHandler:nil];
 }
 
 + (NANetworkOperation *)sendJsonAsynchronousRequest:(NSURLRequest *)request
@@ -91,12 +89,13 @@ static BOOL __reachability__ = NO;
                                               queue:(NSOperationQueue *)queue
                                          identifier:(NSString *)identifier
                                  identifierMaxCount:(NSInteger)identifierMaxCount
+                                           maskType:(NAProgressHUDMaskType)maskType
                                             options:(NSDictionary *)options
                                      queueingOption:(NANetworkOperationQueingOption)queueingOption
                                      successHandler:(void(^)(NANetworkOperation *op, id data))successHandler
                                        errorHandler:(void(^)(NANetworkOperation *op, NSError *err))errorHandler
                                     completeHandler:(void (^)(NANetworkOperation *))completeHandler{
-    return [self _sendAsynchronousRequest:request isJson:YES jsonOption:jsonOption returnEncoding:returnEncoding returnMain:returnMain queue:queue identifier:identifier identifierMaxCount:identifierMaxCount options:options queueingOption:queueingOption successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
+    return [self _sendAsynchronousRequest:request isJson:YES jsonOption:jsonOption returnEncoding:returnEncoding returnMain:returnMain queue:queue identifier:identifier identifierMaxCount:identifierMaxCount maskType:maskType options:options queueingOption:queueingOption successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
 }
 
 + (NANetworkOperation *)sendAsynchronousRequest:(NSURLRequest *)request
@@ -109,7 +108,7 @@ static BOOL __reachability__ = NO;
                                  queueingOption:(NANetworkOperationQueingOption)queueingOption
                                  successHandler:(void(^)(NANetworkOperation *op, id data))successHandler
                                    errorHandler:(void(^)(NANetworkOperation *op, NSError *err))errorHandler{
-    return [self _sendAsynchronousRequest:request isJson:NO jsonOption:0 returnEncoding:returnEncoding returnMain:returnMain queue:queue identifier:identifier identifierMaxCount:identifierMaxCount  options:options queueingOption:queueingOption successHandler:successHandler errorHandler:errorHandler completeHandler:nil];
+    return [self _sendAsynchronousRequest:request isJson:NO jsonOption:0 returnEncoding:returnEncoding returnMain:returnMain queue:queue identifier:identifier identifierMaxCount:identifierMaxCount maskType:NAProgressHUDMaskTypeDefault options:options queueingOption:queueingOption successHandler:successHandler errorHandler:errorHandler completeHandler:nil];
 }
 
 + (NANetworkOperation *)sendAsynchronousRequest:(NSURLRequest *)request
@@ -118,12 +117,13 @@ static BOOL __reachability__ = NO;
                                           queue:(NSOperationQueue *)queue
                                      identifier:(NSString *)identifier
                              identifierMaxCount:(NSInteger)identifierMaxCount
+                                       maskType:(NAProgressHUDMaskType)maskType
                                         options:(NSDictionary *)options
                                  queueingOption:(NANetworkOperationQueingOption)queueingOption
                                  successHandler:(void(^)(NANetworkOperation *op, id data))successHandler
                                    errorHandler:(void(^)(NANetworkOperation *op, NSError *err))errorHandler
                                 completeHandler:(void (^)(NANetworkOperation *))completeHandler{
-    return [self _sendAsynchronousRequest:request isJson:NO jsonOption:0 returnEncoding:returnEncoding returnMain:returnMain queue:queue identifier:identifier identifierMaxCount:identifierMaxCount  options:options queueingOption:queueingOption successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
+    return [self _sendAsynchronousRequest:request isJson:NO jsonOption:0 returnEncoding:returnEncoding returnMain:returnMain queue:queue identifier:identifier identifierMaxCount:identifierMaxCount maskType:maskType options:options queueingOption:queueingOption successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
 }
 
 + (NANetworkOperation *)_sendAsynchronousRequest:(NSURLRequest *)request
@@ -134,6 +134,7 @@ static BOOL __reachability__ = NO;
                                               queue:(NSOperationQueue *)queue
                                       identifier:(NSString *)identifier
                               identifierMaxCount:(NSInteger)identifierMaxCount
+                                        maskType:(NAProgressHUDMaskType)maskType
                                          options:(NSDictionary *)options
                                   queueingOption:(NANetworkOperationQueingOption)queueingOption
                                      successHandler:(void(^)(NANetworkOperation *op, id data))successHandler
@@ -152,7 +153,7 @@ static BOOL __reachability__ = NO;
         }
     }
     
-    [[NANetworkActivityIndicatorManager sharedManager] incrementActivityCount:identifier option:options];
+    [[NANetworkActivityIndicatorManager sharedManager] incrementActivityCount:identifier maskType:maskType option:options];
     
     op = [[[self class] alloc] initWithRequest:request];
     [__all_operations__ addObject:op];
@@ -237,6 +238,7 @@ static BOOL __reachability__ = NO;
                 response = wself.responseData;
                 if(isJson){
                     NSError *jsonErr = nil;
+#warning Json parsingはresponseのbyte=0とかで落ちる．try catchすべき
                     response = [response objectFromJSONDataWithParseOptions:JKParseOptionStrict error:&jsonErr];
                     if(jsonErr){
                         _err = jsonErr;

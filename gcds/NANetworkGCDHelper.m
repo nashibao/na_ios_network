@@ -27,11 +27,12 @@ NSInteger __networking__count__ = 0;
                           isJson:(BOOL)isJSON
                       jsonOption:(NSJSONReadingOptions)jsonOption
                       returnMain:(BOOL)returnMain
+                        maskType:(NAProgressHUDMaskType)maskType
                   successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
                     errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler
                  completeHandler:(void(^)())completeHandler{
     
-    [[NANetworkActivityIndicatorManager sharedManager] incrementActivityCount:nil option:nil];
+    [[NANetworkActivityIndicatorManager sharedManager] incrementActivityCount:nil maskType:maskType option:nil];
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue globalBackgroundQueue] completionHandler:^(NSURLResponse *resp, NSData *data, NSError *err) {
         NSError *_err = nil;
@@ -96,7 +97,7 @@ NSInteger __networking__count__ = 0;
                          returnMain:(BOOL)returnMain
                      successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
                        errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler{
-    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:YES jsonOption:jsonOption returnMain:returnMain successHandler:successHandler errorHandler:errorHandler completeHandler:nil];
+    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:YES jsonOption:jsonOption returnMain:returnMain maskType:NAProgressHUDMaskTypeDefault successHandler:successHandler errorHandler:errorHandler completeHandler:nil];
 }
 
 
@@ -107,7 +108,19 @@ NSInteger __networking__count__ = 0;
                      successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
                        errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler
                     completeHandler:(void (^)())completeHandler{
-    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:YES jsonOption:jsonOption returnMain:returnMain successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
+    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:YES jsonOption:jsonOption returnMain:returnMain maskType:NAProgressHUDMaskTypeDefault successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
+}
+
+
++ (void)sendJsonAsynchronousRequest:(NSURLRequest *)request
+                         jsonOption:(NSJSONReadingOptions)jsonOption
+                     returnEncoding:(NSStringEncoding)returnEncoding
+                         returnMain:(BOOL)returnMain
+                           maskType:(NAProgressHUDMaskType)maskType
+                     successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
+                       errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler
+                    completeHandler:(void (^)())completeHandler{
+    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:YES jsonOption:jsonOption returnMain:returnMain maskType:maskType successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
 }
 
 + (void)sendAsynchronousRequest:(NSURLRequest *)request
@@ -115,7 +128,7 @@ NSInteger __networking__count__ = 0;
                      returnMain:(BOOL)returnMain
                  successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
                    errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler{
-    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:NO jsonOption:NSJSONReadingAllowFragments returnMain:returnMain successHandler:successHandler errorHandler:errorHandler completeHandler:nil];
+    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:NO jsonOption:NSJSONReadingAllowFragments returnMain:returnMain maskType:NAProgressHUDMaskTypeDefault successHandler:successHandler errorHandler:errorHandler completeHandler:nil];
 }
 
 + (void)sendAsynchronousRequest:(NSURLRequest *)request
@@ -124,7 +137,17 @@ NSInteger __networking__count__ = 0;
                  successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
                    errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler
                 completeHandler:(void (^)())completeHandler{
-    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:NO jsonOption:NSJSONReadingAllowFragments returnMain:returnMain successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
+    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:NO jsonOption:NSJSONReadingAllowFragments returnMain:returnMain maskType:NAProgressHUDMaskTypeDefault successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
+}
+
++ (void)sendAsynchronousRequest:(NSURLRequest *)request
+                 returnEncoding:(NSStringEncoding)returnEncoding
+                     returnMain:(BOOL)returnMain
+                       maskType:(NAProgressHUDMaskType)maskType
+                 successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
+                   errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler
+                completeHandler:(void (^)())completeHandler{
+    [self _sendAsynchronousRequest:request returnEncoding:returnEncoding isJson:NO jsonOption:NSJSONReadingAllowFragments returnMain:returnMain maskType:maskType successHandler:successHandler errorHandler:errorHandler completeHandler:completeHandler];
 }
 
 + (void)setGlobalErrorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler{

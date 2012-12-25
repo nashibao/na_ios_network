@@ -8,6 +8,8 @@
 
 #import "NABaseNetworkOperation.h"
 
+#import "NANetworkActivityIndicatorManager.h"
+
 #define NANetworkOperationIdentifierStart @"NANetworkOperationIdentifierStart"
 #define NANetworkOperationIdentifierEnd @"NANetworkOperationIdentifierEnd"
 
@@ -63,6 +65,7 @@ typedef void (^COMPLETE_BLOCK)(id op);
                                               queue:(NSOperationQueue *)queue
                                          identifier:(NSString *)identifier
                                  identifierMaxCount:(NSInteger)identifierMaxCount
+                                           maskType:(NAProgressHUDMaskType)maskType
                                             options:(NSDictionary *)options
                                      queueingOption:(NANetworkOperationQueingOption)queueingOption
                                      successHandler:(void(^)(NANetworkOperation *op, id data))successHandler
@@ -87,6 +90,7 @@ typedef void (^COMPLETE_BLOCK)(id op);
                                           queue:(NSOperationQueue *)queue
                                      identifier:(NSString *)identifier
                              identifierMaxCount:(NSInteger)identifierMaxCount
+                                       maskType:(NAProgressHUDMaskType)maskType
                                         options:(NSDictionary *)options
                                  queueingOption:(NANetworkOperationQueingOption)queueingOption
                                  successHandler:(void(^)(NANetworkOperation *op, id data))successHandler

@@ -12,6 +12,8 @@
 
 #import "NSURLRequest+na.h"
 
+#import "NANetworkActivityIndicatorManager.h"
+
 /** GCDを利用したNetwork用ヘルパー
  */
 @interface NANetworkGCDHelper : NSObject
@@ -38,6 +40,14 @@
                    errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler
                 completeHandler:(void(^)())completeHandler;
 
++ (void)sendAsynchronousRequest:(NSURLRequest *)request
+                 returnEncoding:(NSStringEncoding)returnEncoding
+                     returnMain:(BOOL)returnMain
+                       maskType:(NAProgressHUDMaskType)maskType
+                 successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
+                   errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler
+                completeHandler:(void(^)())completeHandler;
+
 /** json request wrapper
  
  @param request リクエスト
@@ -58,6 +68,15 @@
                          jsonOption:(NSJSONReadingOptions)jsonOption
                      returnEncoding:(NSStringEncoding)returnEncoding
                          returnMain:(BOOL)returnMain
+                     successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
+                       errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler
+                    completeHandler:(void(^)())completeHandler;
+
++ (void)sendJsonAsynchronousRequest:(NSURLRequest *)request
+                         jsonOption:(NSJSONReadingOptions)jsonOption
+                     returnEncoding:(NSStringEncoding)returnEncoding
+                         returnMain:(BOOL)returnMain
+                           maskType:(NAProgressHUDMaskType)maskType
                      successHandler:(void(^)(NSURLResponse *resp, id data))successHandler
                        errorHandler:(void(^)(NSURLResponse *resp, NSError *err))errorHandler
                     completeHandler:(void(^)())completeHandler;
