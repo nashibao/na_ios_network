@@ -26,4 +26,7 @@
                       query:(NSDictionary *)query
                    protocol:(NANetworkProtocol)protocol
                    encoding:(NSStringEncoding)encoding;
+
++ (NSString *)encodeURIComponent:(NSString *)source byEncoding:(NSStringEncoding)encoding;
+
 @end

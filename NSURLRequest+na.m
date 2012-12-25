@@ -10,6 +10,14 @@
 
 @implementation NSURLRequest (na)
 
++ (NSString *)encodeURIComponent:(NSString *)source byEncoding:(NSStringEncoding)encoding{
+    return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
+                                                                                 (__bridge CFStringRef)source,
+                                                                                 NULL,
+                                                                                 (CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ",
+                                                                                 CFStringConvertNSStringEncodingToEncoding(encoding));
+}
+
 + (NSURLRequest *)request:(NSString *)baseURL query:(NSDictionary *)query protocol:(NANetworkProtocol)protocol encoding:(NSStringEncoding)encoding{
 	NSString *urlstring = [baseURL stringByAddingPercentEscapesUsingEncoding:encoding];
     NSMutableString *requestString = [[NSMutableString alloc] init];
