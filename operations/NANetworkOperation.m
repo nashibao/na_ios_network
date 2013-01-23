@@ -36,7 +36,7 @@ static BOOL __reachability__ = NO;
     __reach__.reachableBlock = ^(Reachability *reach){
         if(__reachability__)return;
         __reachability__ = YES;
-        NSLog(@"%s|%@", __PRETTY_FUNCTION__, @"Reachable!!");
+        //gNSLog(@"%s|%@", __PRETTY_FUNCTION__, @"Reachable!!");
 //        waiting -> queue
         int opcnt = 0;
         for (NANetworkOperation *op in __waiting_operations__) {
@@ -54,7 +54,7 @@ static BOOL __reachability__ = NO;
     __reach__.unreachableBlock = ^(Reachability *reach){
         if(!__reachability__)return;
         __reachability__ = NO;
-        NSLog(@"%s|%@", __PRETTY_FUNCTION__, @"Unreachable!!");
+        //gNSLog(@"%s|%@", __PRETTY_FUNCTION__, @"Unreachable!!");
 //        all -> waiting
         for (NANetworkOperation *op in __all_operations__) {
             [op pause];
@@ -187,7 +187,7 @@ static BOOL __reachability__ = NO;
             op.finish_block = ^{
                 cnt += 1;
                 if(maxcnt == cnt){
-                    NSLog(@"%s|%@", __PRETTY_FUNCTION__, @"cancelled!!");
+                    //gNSLog(@"%s|%@", __PRETTY_FUNCTION__, @"cancelled!!");
                     if(handler)
                         handler();
                 }

@@ -55,7 +55,7 @@ NSInteger __networking__count__ = 0;
         }
         if(_err || !_result){
             NSString *result = [[NSString alloc] initWithData:data encoding:returnEncoding];
-            NSLog(@"%s|%@", __PRETTY_FUNCTION__, result);
+            //gNSLog(@"%s|%@", __PRETTY_FUNCTION__, result);
             if(errorHandler){
                 if(returnMain){
                     dispatch_async(dispatch_get_main_queue(), ^{
